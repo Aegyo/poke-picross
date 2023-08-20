@@ -31,9 +31,7 @@ export class PicrossBoard extends LitElement {
       );
 
       this.rowHints = PicrossBoard.createHints(matrix);
-      const transposed = matrix?.[0].map((col, i) =>
-        matrix.map((row) => row[i]),
-      );
+      const transposed = matrix?.[0].map((_, i) => matrix.map((row) => row[i]));
       this.columnHints = PicrossBoard.createHints(transposed);
 
       this.guesses = matrix?.map((row) => row.map(() => 0));
@@ -135,8 +133,8 @@ export class PicrossBoard extends LitElement {
         ${this.puzzle?.matrix.map((row, y) =>
           repeat(
             row,
-            (cell, x) => `${this.puzzle?.name}-${x}-${y}`,
-            (cell, x) =>
+            (_, x) => `${this.puzzle?.name}-${x}-${y}`,
+            (_, x) =>
               html`<picross-cell
                 .onChange=${(state: CellState) =>
                   this.onCellChange(x, y, state)}
