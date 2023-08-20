@@ -18,6 +18,8 @@ export class PicrossBoard extends LitElement {
   private rowHints?: number[][];
   private columnHints?: number[][];
   private guesses?: number[][];
+  private startTime?: number;
+  private endTime?: number;
 
   protected willUpdate(
     _changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
@@ -35,6 +37,9 @@ export class PicrossBoard extends LitElement {
       this.columnHints = PicrossBoard.createHints(transposed);
 
       this.guesses = matrix?.map((row) => row.map(() => 0));
+
+      this.startTime = undefined;
+      this.endTime = undefined;
     }
   }
 
@@ -44,12 +49,28 @@ export class PicrossBoard extends LitElement {
     }
     this.guesses[y][x] = Number(val === CellState.checked);
 
+    if (!this.startTime) {
+      this.startTime = Date.now();
+    }
+
     if (
       this.guesses.every((row, y) =>
         row.every((cell, x) => cell === this.puzzle?.matrix[y][x]),
       )
     ) {
-      alert("complete!");
+      this.endTime = Date.now();
+      const totalSeconds = (this.endTime - this.startTime) / 1000;
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      setTimeout(
+        () =>
+          alert(
+            `Complete!\nTime taken: ${
+              minutes < 10 ? "0" + minutes : minutes
+            }:${seconds.toFixed(2)}!`,
+          ),
+        0,
+      );
     }
   }
 
