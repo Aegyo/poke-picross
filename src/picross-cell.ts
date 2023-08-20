@@ -40,7 +40,12 @@ export class PicrossCell extends LitElement {
         break;
     }
     return html`<div
-      @click=${this.click}
+      @mousedown=${this.click}
+      @mouseover=${(e: MouseEvent) => {
+        if (e.buttons) {
+          this.click();
+        }
+      }}
       class="square"
       style="background: ${background}"
     ></div>`;
