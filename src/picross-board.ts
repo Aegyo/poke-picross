@@ -1,5 +1,7 @@
 import { LitElement, PropertyValueMap, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import "./picross-cell";
+import { CellState } from "./picross-cell";
 
 type Puzzle = {
   name: string;
@@ -14,6 +16,7 @@ export class PicrossBoard extends LitElement {
   private alpha?: number[][];
   private rowHints?: number[][];
   private columnHints?: number[][];
+  private guesses?: number[][];
 
   protected willUpdate(
     _changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
@@ -29,6 +32,23 @@ export class PicrossBoard extends LitElement {
         matrix.map((row) => row[i]),
       );
       this.columnHints = PicrossBoard.createHints(transposed);
+
+      this.guesses = matrix?.map((row) => row.map(() => 0));
+    }
+  }
+
+  onCellChange(x: number, y: number, val: CellState) {
+    if (!this.guesses || !this.puzzle?.matrix) {
+      return;
+    }
+    this.guesses[y][x] = Number(val === CellState.checked);
+
+    if (
+      this.guesses.every((row, y) =>
+        row.every((cell, x) => cell === this.puzzle?.matrix[y][x]),
+      )
+    ) {
+      alert("complete!");
     }
   }
 
@@ -82,7 +102,6 @@ export class PicrossBoard extends LitElement {
   }
 
   render() {
-    console.log(this.puzzle);
     return html` <style>
         .board {
           --rows: ${this.puzzle?.matrix.length};
@@ -94,12 +113,11 @@ export class PicrossBoard extends LitElement {
         ${this.puzzle?.matrix.map((row, y) =>
           row.map(
             (cell, x) =>
-              html`<div
-                class="square"
-                style="background: ${cell
-                  ? "black"
-                  : `rgba(255, 255, 255, ${this.alpha?.[y][x]})`}"
-              ></div>`,
+              html`<picross-cell
+                .onChange=${(state: CellState) =>
+                  this.onCellChange(x, y, state)}
+                .alpha=${this.alpha?.[y][x]}
+              ></picross-cell>`,
           ),
         )}
       </div>`;
