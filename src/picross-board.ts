@@ -2,6 +2,7 @@ import { LitElement, PropertyValueMap, css, html } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import "./picross-cell";
 import { CellState } from "./picross-cell";
+import { repeat } from "lit/directives/repeat.js";
 
 type Puzzle = {
   name: string;
@@ -111,7 +112,9 @@ export class PicrossBoard extends LitElement {
       ${this.renderRowHints()} ${this.renderColumnHints()}
       <div class="board">
         ${this.puzzle?.matrix.map((row, y) =>
-          row.map(
+          repeat(
+            row,
+            (cell, x) => `${this.puzzle?.name}-${x}-${y}`,
             (cell, x) =>
               html`<picross-cell
                 .onChange=${(state: CellState) =>

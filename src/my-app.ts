@@ -2,6 +2,7 @@ import { LitElement, css, html } from "lit";
 import solutions from "./data/solutions.json";
 import "./picross-board";
 import { customElement, property } from "lit/decorators.js";
+import "./side-nav";
 
 const colors = {
   Bug: "#8cb521",
@@ -45,6 +46,24 @@ export class MyApp extends LitElement {
           background: ${colors[puzzle?.type ?? "Normal"]};
         }
       </style>
+      <side-nav>
+        ${solutions.map((area, i) =>
+          area.map(
+            (level, j) =>
+              html`<li
+                class="${this.area === i + 1 && this.level === j + 1
+                  ? "selected"
+                  : ""}"
+                @click=${() => {
+                  this.area = i + 1;
+                  this.level = j + 1;
+                }}
+              >
+                ${i + 1}-${j + 1} ${level.name}
+              </li>`,
+          ),
+        )}
+      </side-nav>
       <picross-board .puzzle=${puzzle}></picross-board>
     `;
   }
@@ -61,6 +80,17 @@ export class MyApp extends LitElement {
       height: 100%;
       min-width: 100vw;
       min-height: 100vh;
+      max-height: 100vh;
+    }
+
+    side-nav > li {
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    side-nav > li:hover,
+    side-nav > li.selected {
+      background: rgba(255, 255, 255, 0.5);
     }
   `;
 }
