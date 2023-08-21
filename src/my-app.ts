@@ -1,8 +1,9 @@
 import { LitElement, TemplateResult, css, html } from "lit";
 import solutions from "./data/solutions.json";
 import "./picross-board";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import "./side-nav";
+import check from "./assets/check.svg";
 
 const colors = {
   Bug: "#8cb521",
@@ -37,22 +38,61 @@ export type Puzzle = {
   matrix: number[][];
 };
 
+type SaveGroupData = {
+  groups?: SaveGroupData[];
+  levels?: SaveLevelData[];
+};
+
+type SaveLevelData = {
+  time: number;
+};
+
 const officialPuzzles: PuzzleGroup = solutions;
 
 function getPuzzle(group: number, level: number) {
   return officialPuzzles.groups?.[group].levels?.[level];
 }
 
+const saveKey = "saveData";
+
 @customElement("my-app")
 export class MyApp extends LitElement {
   @property() area: number;
   @property() level: number;
+  @state() saveData: SaveGroupData;
 
   constructor() {
     super();
     const params = new URLSearchParams(window.location.search);
     this.area = Number(params.get("area") ?? 0);
     this.level = Number(params.get("level") ?? 0);
+
+    this.saveData = JSON.parse(
+      localStorage.getItem(saveKey) ?? '{ "groups": [] }',
+    );
+  }
+
+  getBestTime(area: number, level: number) {
+    return this.saveData.groups?.[area]?.levels?.[level]?.time;
+  }
+
+  puzzleSolved(e: CustomEvent<{ time: number }>) {
+    const prevBest = this.getBestTime(this.area, this.level);
+
+    if (!prevBest || e.detail.time < prevBest) {
+      if (!this.saveData.groups![this.area]) {
+        this.saveData.groups![this.area] = { levels: [] };
+      }
+
+      const old = this.saveData.groups![this.area].levels![this.level] ?? {};
+      this.saveData.groups![this.area].levels![this.level] = Object.assign(
+        old,
+        { time: e.detail.time },
+      );
+
+      localStorage.setItem(saveKey, JSON.stringify(this.saveData));
+      this.requestUpdate();
+    }
   }
 
   renderGroupNav(group: PuzzleGroup, groupIdx?: number): TemplateResult<1> {
@@ -75,6 +115,8 @@ export class MyApp extends LitElement {
       }}
     >
       ${levelIdx + 1} - ${level.name}
+      ${this.getBestTime(groupIdx, levelIdx) &&
+      html`<img class="level-complete" src=${check} />`}
     </li>`;
   }
 
@@ -88,7 +130,11 @@ export class MyApp extends LitElement {
         }
       </style>
       <side-nav> ${this.renderGroupNav(officialPuzzles)} </side-nav>
-      <picross-board .puzzle=${puzzle}></picross-board>
+      <picross-board
+        .puzzle=${puzzle}
+        bestTime=${this.getBestTime(this.area, this.level)}
+        @puzzle.solved=${this.puzzleSolved}
+      ></picross-board>
     `;
   }
 
@@ -121,6 +167,9 @@ export class MyApp extends LitElement {
       cursor: inherit;
       padding-top: 10px;
       font-weight: bold;
+    }
+    side-nav img.level-complete {
+      float: right;
     }
   `;
 }

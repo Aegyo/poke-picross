@@ -5,6 +5,7 @@ import { customElement, property } from "lit/decorators.js";
 export class GameTimer extends LitElement {
   @property({ type: Number }) startTime?: number;
   @property({ type: Number }) endTime?: number;
+  @property({ type: Number }) bestTime?: number;
 
   private intervalID?: number;
 
@@ -28,21 +29,27 @@ export class GameTimer extends LitElement {
     const fixed = num.toFixed(decimals);
     return `${fixed.split(".")[0].length < 2 ? "0" : ""}${fixed}`;
   }
-  renderTime(start: number, end: number, decimals = 0) {
+  renderTime(start: number, end: number, decimals = 0, text = "") {
     const totalSeconds = (end - start) / 1000;
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return html`<p>
-      ${this.padTime(minutes)}:${this.padTime(seconds, decimals)}
+      ${text} ${this.padTime(minutes)}:${this.padTime(seconds, decimals)}
     </p>`;
+  }
+  renderBestTime() {
+    if (this.bestTime) {
+      return this.renderTime(0, this.bestTime, 2, "Best time: ");
+    }
   }
 
   render() {
-    if (!this.startTime) return;
-    return this.endTime
+    if (!this.startTime) return this.renderBestTime();
+    return html`${this.endTime
       ? html`${this.renderTime(this.startTime, this.endTime, 2)}
           <p>Solved!</p>`
-      : html`${this.renderTime(this.startTime, Date.now())}`;
+      : this.renderTime(this.startTime, Date.now())}
+    ${this.renderBestTime()}`;
   }
 
   static styles = css`

@@ -9,6 +9,7 @@ import { Puzzle } from "./my-app";
 @customElement("picross-board")
 export class PicrossBoard extends LitElement {
   @property() puzzle?: Puzzle;
+  @property({ type: Number }) bestTime?: number;
 
   private alpha?: number[][];
   private rowHints?: number[][];
@@ -53,6 +54,11 @@ export class PicrossBoard extends LitElement {
       )
     ) {
       this.endTime = Date.now();
+      this.dispatchEvent(
+        new CustomEvent("puzzle.solved", {
+          detail: { time: this.endTime - this.startTime },
+        }),
+      );
     }
   }
 
@@ -106,6 +112,7 @@ export class PicrossBoard extends LitElement {
   }
 
   render() {
+    console.log(this.bestTime);
     return html` <style>
         .board {
           --rows: ${this.puzzle?.matrix.length};
@@ -131,6 +138,7 @@ export class PicrossBoard extends LitElement {
       <game-timer
         startTime=${this.startTime}
         endTime=${this.endTime}
+        bestTime=${this.bestTime}
       ></game-timer>`;
   }
 
@@ -152,7 +160,7 @@ export class PicrossBoard extends LitElement {
       touch-action: none;
     }
     game-timer {
-      grid-column: 2;
+      grid-column: span 3;
       grid-row: 3;
     }
 
