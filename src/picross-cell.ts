@@ -7,11 +7,6 @@ export enum CellState {
   crossed = "crossed",
 }
 
-const lastMovedThrough = null;
-function handlePointerMove(e: PointerEvent, cell: PicrossCell) {
-  console.log(e, cell);
-}
-
 @customElement("picross-cell")
 export class PicrossCell extends LitElement {
   @property() state = CellState.empty;
