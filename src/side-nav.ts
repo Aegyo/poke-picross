@@ -28,6 +28,11 @@ export class SideNav extends LitElement {
       position: absolute;
       top: 0;
       left: 0;
+      transition: transform 0.4s ease-in-out;
+    }
+
+    #menu-wrapper.closed {
+      transform: translateX(-250px);
     }
 
     .menu-items {
@@ -48,10 +53,6 @@ export class SideNav extends LitElement {
 
     .toggle-nav > img {
       margin-top: 4px;
-    }
-
-    #menu-wrapper.closed {
-      left: -250px;
     }
 
     ul {
