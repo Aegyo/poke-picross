@@ -4,12 +4,7 @@ import { CellState } from "./picross-cell";
 import { repeat } from "lit/directives/repeat.js";
 import "./picross-cell";
 import "./game-timer";
-
-type Puzzle = {
-  name: string;
-  type: string;
-  matrix: number[][];
-};
+import { Puzzle } from "./my-app";
 
 @customElement("picross-board")
 export class PicrossBoard extends LitElement {

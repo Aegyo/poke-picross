@@ -1,4 +1,4 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, TemplateResult, css, html } from "lit";
 import solutions from "./data/solutions.json";
 import "./picross-board";
 import { customElement, property } from "lit/decorators.js";
@@ -25,6 +25,24 @@ const colors = {
   Water: "#294a94",
 } as Record<string, string>;
 
+export type PuzzleGroup = {
+  name: string;
+  groups?: PuzzleGroup[];
+  levels?: Puzzle[];
+};
+
+export type Puzzle = {
+  name: string;
+  type: string;
+  matrix: number[][];
+};
+
+const officialPuzzles: PuzzleGroup = solutions;
+
+function getPuzzle(group: number, level: number) {
+  return officialPuzzles.groups?.[group].levels?.[level];
+}
+
 @customElement("my-app")
 export class MyApp extends LitElement {
   @property() area: number;
@@ -33,37 +51,43 @@ export class MyApp extends LitElement {
   constructor() {
     super();
     const params = new URLSearchParams(window.location.search);
-    this.area = Number(params.get("area") ?? 1);
-    this.level = Number(params.get("level") ?? 1);
+    this.area = Number(params.get("area") ?? 0);
+    this.level = Number(params.get("level") ?? 0);
+  }
+
+  renderGroupNav(group: PuzzleGroup, groupIdx?: number): TemplateResult<1> {
+    return html`<li class="group-header">${group.name}</li>
+      ${group.groups?.map((subGroup, i) =>
+        this.renderGroupNav(subGroup, i),
+      )}${group.levels?.map((level, i) =>
+        this.renderLevelNav(level, groupIdx ?? 0, i),
+      )}`;
+  }
+
+  renderLevelNav(level: Puzzle, groupIdx: number, levelIdx: number) {
+    return html`<li
+      class="${this.area === groupIdx && this.level === levelIdx
+        ? "selected"
+        : ""}"
+      @click=${() => {
+        this.area = groupIdx;
+        this.level = levelIdx;
+      }}
+    >
+      ${levelIdx + 1} - ${level.name}
+    </li>`;
   }
 
   render() {
     console.group(this.area, this.level);
-    const puzzle = solutions[this.area - 1][this.level - 1];
+    const puzzle = getPuzzle(this.area, this.level);
     return html`
       <style>
         :host {
           background: ${colors[puzzle?.type ?? "Normal"]};
         }
       </style>
-      <side-nav>
-        ${solutions.map((area, i) =>
-          area.map(
-            (level, j) =>
-              html`<li
-                class="${this.area === i + 1 && this.level === j + 1
-                  ? "selected"
-                  : ""}"
-                @click=${() => {
-                  this.area = i + 1;
-                  this.level = j + 1;
-                }}
-              >
-                ${i + 1}-${j + 1} ${level.name}
-              </li>`,
-          ),
-        )}
-      </side-nav>
+      <side-nav> ${this.renderGroupNav(officialPuzzles)} </side-nav>
       <picross-board .puzzle=${puzzle}></picross-board>
     `;
   }
@@ -88,9 +112,15 @@ export class MyApp extends LitElement {
       padding: 5px;
     }
 
-    side-nav > li:hover,
+    side-nav > li:hover:not(.group-header),
     side-nav > li.selected {
       background: rgba(255, 255, 255, 0.5);
+    }
+
+    side-nav > li.group-header {
+      cursor: inherit;
+      padding-top: 10px;
+      font-weight: bold;
     }
   `;
 }
