@@ -7,6 +7,11 @@ export enum CellState {
   crossed = "crossed",
 }
 
+const lastMovedThrough = null;
+function handlePointerMove(e: PointerEvent, cell: PicrossCell) {
+  console.log(e, cell);
+}
+
 @customElement("picross-cell")
 export class PicrossCell extends LitElement {
   @property() state = CellState.empty;
@@ -43,8 +48,12 @@ export class PicrossCell extends LitElement {
         break;
     }
     return html`<div
-      @mousedown=${this.click}
-      @mouseover=${(e: MouseEvent) => {
+      @pointerdown=${(e: PointerEvent) => {
+        if (e.pointerType !== "touch") {
+          this.click();
+        }
+      }}
+      @pointerenter=${(e: PointerEvent) => {
         if (e.buttons) {
           this.click();
         }
@@ -58,6 +67,7 @@ export class PicrossCell extends LitElement {
     div {
       width: 100%;
       height: 100%;
+      touch-action: none;
     }
   `;
 }

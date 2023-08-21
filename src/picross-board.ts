@@ -153,6 +153,8 @@ export class PicrossBoard extends LitElement {
       grid-template-columns: repeat(var(--cols), 20px);
       grid-template-rows: repeat(var(--rows), 20px);
       gap: 1px;
+
+      touch-action: none;
     }
     game-timer {
       grid-column: 2;
