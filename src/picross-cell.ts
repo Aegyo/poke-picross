@@ -12,8 +12,11 @@ export class PicrossCell extends LitElement {
   @property() state = CellState.empty;
   @property() alpha = 0;
   @property() onChange?: (state: CellState) => void;
+  @property({ type: Boolean }) completed = false;
 
   click() {
+    if (this.completed) return;
+
     const next: Record<CellState, CellState> = {
       [CellState.empty]: CellState.checked,
       [CellState.checked]: CellState.crossed,

@@ -1,8 +1,9 @@
 import { LitElement, PropertyValueMap, css, html } from "lit";
-import { customElement, property } from "lit/decorators.js";
-import "./picross-cell";
+import { customElement, property, state } from "lit/decorators.js";
 import { CellState } from "./picross-cell";
 import { repeat } from "lit/directives/repeat.js";
+import "./picross-cell";
+import "./game-timer";
 
 type Puzzle = {
   name: string;
@@ -18,8 +19,8 @@ export class PicrossBoard extends LitElement {
   private rowHints?: number[][];
   private columnHints?: number[][];
   private guesses?: number[][];
-  private startTime?: number;
-  private endTime?: number;
+  @state() startTime?: number;
+  @state() endTime?: number;
 
   protected willUpdate(
     _changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
@@ -57,18 +58,6 @@ export class PicrossBoard extends LitElement {
       )
     ) {
       this.endTime = Date.now();
-      const totalSeconds = (this.endTime - this.startTime) / 1000;
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      setTimeout(
-        () =>
-          alert(
-            `Complete!\nTime taken: ${
-              minutes < 10 ? "0" + minutes : minutes
-            }:${seconds.toFixed(2)}!`,
-          ),
-        0,
-      );
     }
   }
 
@@ -136,20 +125,25 @@ export class PicrossBoard extends LitElement {
             (_, x) => `${this.puzzle?.name}-${x}-${y}`,
             (_, x) =>
               html`<picross-cell
+                ?completed=${this.endTime !== undefined}
                 .onChange=${(state: CellState) =>
                   this.onCellChange(x, y, state)}
                 .alpha=${this.alpha?.[y][x]}
               ></picross-cell>`,
           ),
         )}
-      </div>`;
+      </div>
+      <game-timer
+        startTime=${this.startTime}
+        endTime=${this.endTime}
+      ></game-timer>`;
   }
 
   static styles = css`
     :host {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
-      grid-template-rows: 1fr auto 1fr;
+      grid-template-rows: 1fr auto auto;
     }
     .board {
       grid-column: 2;
@@ -159,6 +153,10 @@ export class PicrossBoard extends LitElement {
       grid-template-columns: repeat(var(--cols), 20px);
       grid-template-rows: repeat(var(--rows), 20px);
       gap: 1px;
+    }
+    game-timer {
+      grid-column: 2;
+      grid-row: 3;
     }
 
     .columnHints {
