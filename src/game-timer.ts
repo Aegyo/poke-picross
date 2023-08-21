@@ -25,7 +25,8 @@ export class GameTimer extends LitElement {
   }
 
   padTime(num: number, decimals = 0) {
-    return `${num < 10 ? "0" : ""}${num.toFixed(decimals)}`;
+    const fixed = num.toFixed(decimals);
+    return `${fixed.split(".")[0].length < 2 ? "0" : ""}${fixed}`;
   }
   renderTime(start: number, end: number, decimals = 0) {
     const totalSeconds = (end - start) / 1000;
