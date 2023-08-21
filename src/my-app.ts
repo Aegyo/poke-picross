@@ -146,11 +146,13 @@ export class MyApp extends LitElement {
 
       padding: 10% 0 0 0;
       margin: 0;
-      width: 100%;
-      height: 100%;
       min-width: 100vw;
       min-height: 100vh;
-      max-height: 100vh;
+      min-height: 100vh;
+    }
+
+    picross-board {
+      margin-bottom: 5%;
     }
 
     side-nav > li {
