@@ -51,9 +51,10 @@ export class PicrossCell extends LitElement {
 
   render() {
     let background;
+    const transparent = `rgba(255, 255, 255, ${this.alpha})`;
     switch (this.state) {
       case CellState.empty:
-        background = `rgba(255, 255, 255, ${this.alpha})`;
+        background = transparent;
         break;
 
       case CellState.checked:
@@ -61,7 +62,7 @@ export class PicrossCell extends LitElement {
         break;
 
       case CellState.crossed:
-        background = "red";
+        background = this.completed ? transparent : "red";
         break;
     }
     return html`<div

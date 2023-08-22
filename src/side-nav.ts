@@ -29,6 +29,7 @@ export class SideNav extends LitElement {
       top: 0;
       left: 0;
       transition: transform 0.4s ease-in-out;
+      z-index: 100;
     }
 
     #menu-wrapper.closed {
