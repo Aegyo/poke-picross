@@ -50,6 +50,7 @@ export class SideNav extends LitElement {
       float: left;
       width: 26px;
       margin-left: 4px;
+      padding: 0;
     }
 
     .toggle-nav > img {

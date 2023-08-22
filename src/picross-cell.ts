@@ -92,7 +92,9 @@ export class PicrossCell extends LitElement {
     .cross {
       background-color: rgba(0, 0, 0, 0.6);
       mask-image: url(${unsafeCSS(close)});
+      -webkit-mask-image: url(${unsafeCSS(close)});
       mask-size: 100% 100%;
+      -webkit-mask-size: 100% 100%;
     }
   `;
 }
