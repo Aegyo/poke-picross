@@ -1,5 +1,6 @@
-import { LitElement, css, html } from "lit";
+import { LitElement, css, html, unsafeCSS } from "lit";
 import { customElement, property } from "lit/decorators.js";
+import close from "./assets/close.svg";
 
 export enum CellState {
   empty = "empty",
@@ -51,6 +52,7 @@ export class PicrossCell extends LitElement {
 
   render() {
     let background;
+    let content;
     const transparent = `rgba(255, 255, 255, ${this.alpha})`;
     switch (this.state) {
       case CellState.empty:
@@ -62,7 +64,8 @@ export class PicrossCell extends LitElement {
         break;
 
       case CellState.crossed:
-        background = this.completed ? transparent : "red";
+        background = transparent;
+        content = this.completed ? null : html`<div class="cross"></div>`;
         break;
     }
     return html`<div
@@ -73,8 +76,10 @@ export class PicrossCell extends LitElement {
         return false;
       }}
       class="square"
-      style="background: ${background}"
-    ></div>`;
+      style="background: ${background};"
+    >
+      ${content}
+    </div>`;
   }
 
   static styles = css`
@@ -82,6 +87,12 @@ export class PicrossCell extends LitElement {
       width: 100%;
       height: 100%;
       touch-action: none;
+    }
+
+    .cross {
+      background-color: rgba(0, 0, 0, 0.6);
+      mask-image: url(${unsafeCSS(close)});
+      mask-size: 100% 100%;
     }
   `;
 }
