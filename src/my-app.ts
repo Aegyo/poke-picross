@@ -121,7 +121,6 @@ export class MyApp extends LitElement {
   }
 
   render() {
-    console.group(this.area, this.level);
     const puzzle = getPuzzle(this.area, this.level);
     return html`
       <style>
@@ -133,6 +132,7 @@ export class MyApp extends LitElement {
       <picross-board
         .puzzle=${puzzle}
         bestTime=${this.getBestTime(this.area, this.level)}
+        bgColor=${colors[puzzle?.type ?? "Normal"]}
         @puzzle.solved=${this.puzzleSolved}
       ></picross-board>
     `;

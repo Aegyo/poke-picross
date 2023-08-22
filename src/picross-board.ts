@@ -10,6 +10,7 @@ import { Puzzle } from "./my-app";
 export class PicrossBoard extends LitElement {
   @property() puzzle?: Puzzle;
   @property({ type: Number }) bestTime?: number;
+  @property() bgColor?: string;
 
   private alpha?: number[][];
   private rowHints?: number[][];
@@ -135,14 +136,24 @@ export class PicrossBoard extends LitElement {
   }
 
   render() {
-    console.log(this.bestTime);
     return html` <style>
         .board {
           --rows: ${this.puzzle?.matrix.length};
           --cols: ${this.puzzle?.matrix[0].length};
         }
+        .guidelines {
+          --rows: ${(this.puzzle?.matrix.length ?? 0) / 5};
+          --cols: ${(this.puzzle?.matrix[0].length ?? 0) / 5};
+          --bg: ${this.bgColor};
+        }
       </style>
       ${this.renderRowHints()} ${this.renderColumnHints()}
+      <div class="guidelines">
+        ${this.puzzle &&
+        Array((this.puzzle?.matrix.length * this.puzzle?.matrix[0].length) / 25)
+          .fill(null)
+          .map(() => html`<div class="guideline-cell"></div>`)}
+      </div>
       <div
         class="board"
         @pointermove=${this.pointerMove}
@@ -162,6 +173,12 @@ export class PicrossBoard extends LitElement {
           ),
         )}
       </div>
+      <div id="puzzle-info">
+        <p>
+          ${this.puzzle?.name} -
+          ${this.puzzle?.matrix[0].length}x${this.puzzle?.matrix.length}
+        </p>
+      </div>
       <game-timer
         startTime=${this.startTime}
         endTime=${this.endTime}
@@ -173,9 +190,30 @@ export class PicrossBoard extends LitElement {
     :host {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
-      grid-template-rows: 1fr auto auto;
+      grid-template-rows: 1fr auto auto auto;
+    }
+    .guidelines {
+      z-index: 1;
+
+      grid-column: 2;
+      grid-row: 2;
+
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 104px);
+      grid-template-rows: repeat(var(--rows), 104px);
+      gap: 1px;
+
+      background: white;
+      opacity: 1;
+    }
+    .guidelines .guideline-cell {
+      background: var(--bg);
+      width: 100%;
+      height: 100%;
     }
     .board {
+      z-index: 2;
+
       grid-column: 2;
       grid-row: 2;
 
@@ -186,9 +224,16 @@ export class PicrossBoard extends LitElement {
 
       touch-action: none;
     }
-    game-timer {
+    #puzzle-info {
       grid-column: span 3;
       grid-row: 3;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    game-timer {
+      grid-column: span 3;
+      grid-row: 4;
     }
 
     .columnHints {
