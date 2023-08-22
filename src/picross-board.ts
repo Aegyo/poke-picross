@@ -107,11 +107,13 @@ export class PicrossBoard extends LitElement {
 
   private renderRowHints() {
     return html`
-      <div class="rowHints ${this.endTime && "hide-text hide-background"}">
+      <div class="rowHints ${this.endTime && "hide-text"}">
         ${this.rowHints?.map(
           (row, idx) =>
             html`<div
-              style="background: rgba(255, 255, 255, ${this.alpha?.[idx][0]})"
+              style="background: rgba(255, 255, 255, ${this.endTime
+                ? 0
+                : this.alpha?.[idx][0]})"
             >
               ${row.map((hint) => html`<span>${hint}</span>`)}
             </div>`,
@@ -126,7 +128,9 @@ export class PicrossBoard extends LitElement {
         ${this.columnHints?.map(
           (row, idx) =>
             html`<div
-              style="background: rgba(255, 255, 255, ${this.alpha?.[0][idx]})"
+              style="background: rgba(255, 255, 255, ${this.endTime
+                ? 0
+                : this.alpha?.[0][idx]})"
             >
               ${row.map((hint) => html`<span>${hint}</span>`)}
             </div>`,
