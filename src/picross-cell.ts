@@ -24,11 +24,29 @@ export class PicrossCell extends LitElement {
   @property() onChange?: (state: CellState) => void;
   @property({ type: Boolean }) completed = false;
 
+  constructor() {
+    super();
+    this.addEventListener("custom.swipedOver", (e) =>
+      this.changeState((e as CustomEvent).detail.changeTo),
+    );
+  }
   cycleState(forward = true) {
     if (this.completed) return;
 
-    this.state = forward ? next[this.state] : prev[this.state];
+    const state = forward ? next[this.state] : prev[this.state];
+    this.changeState(state);
+  }
+
+  changeState(state: CellState) {
+    this.state = state;
     this.onChange?.(this.state);
+  }
+
+  pointerDown(e: PointerEvent) {
+    this.cycleState(e.buttons !== 2);
+    this.dispatchEvent(
+      new CustomEvent("puzzle.clicked", { bubbles: true, detail: this.state }),
+    );
   }
 
   render() {
@@ -47,16 +65,7 @@ export class PicrossCell extends LitElement {
         break;
     }
     return html`<div
-      @pointerdown=${(e: PointerEvent) => {
-        if (e.pointerType !== "touch") {
-          this.cycleState(e.buttons !== 2);
-        }
-      }}
-      @pointerenter=${(e: PointerEvent) => {
-        if (e.buttons) {
-          this.cycleState(e.buttons !== 2);
-        }
-      }}
+      @pointerdown=${this.pointerDown}
       @contextmenu=${(e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();

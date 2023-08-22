@@ -81,6 +81,29 @@ export class PicrossBoard extends LitElement {
     });
   }
 
+  movedOver = new Set();
+  movingToState = CellState.empty;
+  startedSwipe(e: CustomEvent<CellState>) {
+    this.movedOver.clear();
+    this.movedOver.add(e.target);
+    this.movingToState = e.detail;
+  }
+  pointerMove(e: PointerEvent) {
+    if (!e.buttons) return;
+
+    const el = this.shadowRoot?.elementFromPoint(e.clientX, e.clientY);
+    if (el && !this.movedOver.has(el)) {
+      this.movedOver.add(el);
+      if (this.movedOver.size > 0) {
+        el.dispatchEvent(
+          new CustomEvent("custom.swipedOver", {
+            detail: { changeTo: this.movingToState },
+          }),
+        );
+      }
+    }
+  }
+
   private renderRowHints() {
     return html`
       <div class="rowHints">
@@ -120,7 +143,11 @@ export class PicrossBoard extends LitElement {
         }
       </style>
       ${this.renderRowHints()} ${this.renderColumnHints()}
-      <div class="board">
+      <div
+        class="board"
+        @pointermove=${this.pointerMove}
+        @puzzle.clicked=${this.startedSwipe}
+      >
         ${this.puzzle?.matrix.map((row, y) =>
           repeat(
             row,
