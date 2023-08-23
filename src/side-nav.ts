@@ -30,10 +30,15 @@ export class SideNav extends LitElement {
       left: 0;
       transition: transform 0.4s ease-in-out;
       z-index: 100;
+      pointer-events: none;
     }
 
     #menu-wrapper.closed {
       transform: translateX(-250px);
+    }
+
+    #menu-wrapper > * {
+      pointer-events: all;
     }
 
     .menu-items {
