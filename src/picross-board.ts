@@ -5,6 +5,7 @@ import { repeat } from "lit/directives/repeat.js";
 import "./picross-cell";
 import "./game-timer";
 import { Puzzle } from "./my-app";
+import "./picross-hint";
 
 @customElement("picross-board")
 export class PicrossBoard extends LitElement {
@@ -115,7 +116,9 @@ export class PicrossBoard extends LitElement {
                 ? 0
                 : this.alpha?.[idx][0]})"
             >
-              ${row.map((hint) => html`<span>${hint}</span>`)}
+              ${row.map(
+                (hint) => html`<picross-hint length=${hint}></picross-hint>`,
+              )}
             </div>`,
         )}
       </div>
@@ -132,7 +135,9 @@ export class PicrossBoard extends LitElement {
                 ? 0
                 : this.alpha?.[0][idx]})"
             >
-              ${row.map((hint) => html`<span>${hint}</span>`)}
+              ${row.map(
+                (hint) => html`<picross-hint length=${hint}></picross-hint>`,
+              )}
             </div>`,
         )}
       </div>
@@ -274,7 +279,7 @@ export class PicrossBoard extends LitElement {
       height: 20px;
       width: 100%;
     }
-    .rowHints > div > span {
+    .rowHints > div > picross-hint {
       width: 20px;
       text-align: center;
       line-height: 25px;
