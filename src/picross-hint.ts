@@ -25,6 +25,7 @@ export class PicrossHint extends LitElement {
 
     span.marked {
       opacity: 0.4;
+      text-decoration: line-through;
     }
   `;
 }
