@@ -116,7 +116,9 @@ export class PicrossBoard extends LitElement {
                 ? 0
                 : this.alpha?.[idx][0]})"
             >
-              ${row.map(
+              ${repeat(
+                row,
+                (_, gIdx) => `${this.puzzle?.name}-${idx}-${gIdx}`,
                 (hint) => html`<picross-hint length=${hint}></picross-hint>`,
               )}
             </div>`,
@@ -135,7 +137,9 @@ export class PicrossBoard extends LitElement {
                 ? 0
                 : this.alpha?.[0][idx]})"
             >
-              ${row.map(
+              ${repeat(
+                row,
+                (_, gIdx) => `${this.puzzle?.name}-${idx}-${gIdx}`,
                 (hint) => html`<picross-hint length=${hint}></picross-hint>`,
               )}
             </div>`,
